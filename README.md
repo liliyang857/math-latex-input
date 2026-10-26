@@ -2,6 +2,12 @@
 
 Vue 3 + TypeScript + Vite 项目，使用本地 TinyMCE **6.0.0**，接入从 `../math/src` 构建的公式编辑器 SDK **0.2.31**。
 
+**[在线演示](https://yjt151.github.io/math-latex-input/)**
+
+## 演示部署
+
+推送到 `main` 后，GitHub Actions 会自动构建并部署到 GitHub Pages。仓库的 Settings → Pages → Source 应选择 **GitHub Actions**。部署进度可在仓库 Actions 中查看。
+
 ## 启动
 
 需要 Node.js 22.12+ 和 pnpm。
