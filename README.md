@@ -2,7 +2,7 @@
 
 Vue 3 + TypeScript + Vite 项目，使用本地 TinyMCE **6.0.0**，接入从 `../math/src` 构建的公式编辑器 SDK **0.2.31**。
 
-**[在线演示](https://yjt151.github.io/math-latex-input/)**
+**[在线演示](https://liliyang857.github.io/math-latex-input/)**
 
 ## 演示部署
 
