@@ -15,6 +15,7 @@ import {
   initFormulaRendering,
   openFormulaEditor,
   renderLatex,
+  serializeFormulaContent,
   serializeFormulaLatex,
 } from 'formula-editor-modal'
 import type { FormulaEditorHandle } from 'formula-editor-modal'
@@ -23,6 +24,8 @@ const editorElement = ref<HTMLDivElement>()
 const toolbarElement = ref<HTMLDivElement>()
 const savedContent = ref('')
 const error = ref('')
+const outputType = ref<'latex' | 'img'>('latex')
+const exportFormat = ref<'html' | 'latex'>('html')
 let editor: Editor | undefined
 let formulaDialog: FormulaEditorHandle | undefined
 let disposed = false
@@ -39,7 +42,7 @@ function editFormula(target?: HTMLElement) {
   }
   formulaDialog = openFormulaEditor({
     latex: target?.getAttribute('data-latex') ?? '',
-    outputType: target?.tagName === 'IMG' ? 'img' : 'latex',
+    outputType: target ? (target.tagName === 'IMG' ? 'img' : 'latex') : outputType.value,
     async onConfirm(result) {
       const html = result.type === 'latex' ? await renderLatex(result.latex) : result.data
       if (disposed) return
@@ -60,7 +63,9 @@ function editFormula(target?: HTMLElement) {
 }
 
 function exportContent() {
-  if (editor) savedContent.value = serializeFormulaLatex(editor.getContent())
+  if (editor) savedContent.value = exportFormat.value === 'latex'
+    ? serializeFormulaLatex(editor.getContent())
+    : serializeFormulaContent(editor.getContent())
 }
 
 onMounted(async () => {
@@ -124,9 +129,26 @@ onBeforeUnmount(() => {
         <h1>LaTeX 公式编辑器</h1>
         <p class="description">编辑正文，点击「插入公式」添加公式，双击已有公式可再次修改。</p>
       </div>
-      <button type="button" class="export-button" :disabled="!!error" @click="exportContent">导出内容</button>
+      <div class="page-actions">
+        <label>导出格式
+          <select v-model="exportFormat" aria-label="导出格式">
+            <option value="html">HTML（保留公式图片）</option>
+            <option value="latex">LaTeX（公式转为源码）</option>
+          </select>
+        </label>
+        <button type="button" class="export-button" :disabled="!!error" @click="exportContent">导出内容</button>
+      </div>
     </header>
     <p v-if="error" role="alert" class="error">{{ error }}</p>
+    <div class="formula-options">
+      <label>SDK 返回形式
+        <select v-model="outputType" aria-label="SDK 返回形式">
+          <option value="latex">LaTeX 公式</option>
+          <option value="img">IMG 图片（PNG）</option>
+        </select>
+      </label>
+      <span>用于新插入的公式；双击修改时保留原形式。图片包含 LaTeX 源码，可再次编辑。</span>
+    </div>
     <section class="editor-card" aria-label="富文本编辑器">
       <div ref="toolbarElement" class="editor-toolbar"></div>
       <div ref="editorElement" class="editor-body" aria-label="正文">
@@ -136,7 +158,7 @@ onBeforeUnmount(() => {
       </div>
     </section>
     <section v-if="savedContent" class="export-panel">
-      <h2>导出的 HTML（公式保存为 LaTeX）</h2>
+      <h2>导出结果</h2>
       <textarea aria-label="导出内容" :value="savedContent" readonly spellcheck="false"></textarea>
     </section>
   </main>

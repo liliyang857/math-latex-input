@@ -6,7 +6,12 @@
 }
 * { box-sizing: border-box; }
 body { margin: 0; }
-button, textarea { font: inherit; }
+button, textarea, select { font: inherit; }
+.page-actions, .formula-options { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+.page-actions label, .formula-options label { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+select { padding: 9px; border: 1px solid #dce2ec; border-radius: 6px; background: white; color: inherit; }
+.formula-options { margin-bottom: 16px; }
+.formula-options span { font-size: 13px; color: #68768b; }
 .workspace { max-width: 1120px; margin: 64px auto; padding: 0 24px; }
 .page-header { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 28px; }
 .eyebrow { color: #5572b0; font-size: 12px; letter-spacing: 2px; font-weight: 700; }

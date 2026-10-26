@@ -25,10 +25,11 @@ pnpm preview
 
 ## 使用
 
-- 点击工具栏“插入公式”，打开 SDK 弹窗。
+- 选择“SDK 返回形式”：LaTeX 公式或 IMG 图片（PNG），再点击工具栏“插入公式”。图片模式使用 SDK 的 `outputType: 'img'`，将返回的 `result.data`（含 PNG data URL 的 `<img>` HTML）插入正文。
 - 在可视化或 LaTeX 模式编辑，确认后插入正文；双击已有公式可修改。
 - TinyMCE 管理插入位置及撤销/重做，SDK 负责公式的 MathJax SVG 展示。
-- 点击“导出内容”，获取保留正文 HTML、公式转换为 `$...$` 的内容；目前仅展示导出结果，未连接存储接口。
+- 双击修改保留原公式形式，PNG 图片的 `data-latex` 用于回填源码。
+- “导出格式”默认 HTML，保留公式节点和 PNG 图片；选择 LaTeX 时，将两种公式均转为 `$...$`。目前仅展示导出结果，未连接存储接口。
 
 入口为 `src/App.vue`。TinyMCE 使用 inline 模式，与公式 SDK 共用 document；工具栏、主题、图标、插件和样式均由 npm 包本地加载，无需 CDN 或 Tiny Cloud API Key。不可编辑节点由 TinyMCE 6 核心支持，无需加载旧版 noneditable 插件。
 
@@ -48,8 +49,9 @@ npm pack --pack-destination ../math-latex-input/vendor
 ## 手工回归
 
 1. 打开页面，检查示例方程正常显示。
-2. 在正文末尾插入 `x^2+1`，导出结果应包含 `$x^2+1$`。
+2. 在正文末尾插入 `x^2+1`，选择 LaTeX 导出，结果应包含 `$x^2+1$`。
 3. 双击新公式改为 `x^3+2`，导出只保留新公式，原示例方程仍然存在。
 4. 点击 TinyMCE 的 Undo / Redo，确认公式回退和恢复；打开公式弹窗后取消，应保持正文不变。
+5. 返回形式选择 IMG，插入公式后应生成含 `data-latex` 的 PNG 图片；双击修改仍为图片。HTML 导出保留图片数据，LaTeX 导出转换成源码。
 
 构建会提示较大的 chunk：TinyMCE、MathLive、MathJax 为本地完整依赖，其中公式引擎和字体按需加载。
