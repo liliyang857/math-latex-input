@@ -1,2 +1,49 @@
 # math-latex-input
-基于 Vue 3、TypeScript 和 MathLive 的可视化 LaTeX 公式编辑器 SDK，内置数学、物理、化学公式模板与丰富符号，支持分数、根号、矩阵及化学方程式编辑，提供开箱即用的弹窗组件。
+
+Vue 3 + TypeScript + Vite 项目，使用本地 TinyMCE **6.0.0**，接入从 `../math/src` 构建的公式编辑器 SDK **0.2.31**。
+
+## 启动
+
+需要 Node.js 22.12+ 和 pnpm。
+
+```sh
+pnpm install --frozen-lockfile
+pnpm dev
+```
+
+```sh
+pnpm typecheck
+pnpm build
+pnpm preview
+```
+
+## 使用
+
+- 点击工具栏“插入公式”，打开 SDK 弹窗。
+- 在可视化或 LaTeX 模式编辑，确认后插入正文；双击已有公式可修改。
+- TinyMCE 管理插入位置及撤销/重做，SDK 负责公式的 MathJax SVG 展示。
+- 点击“导出内容”，获取保留正文 HTML、公式转换为 `$...$` 的内容；目前仅展示导出结果，未连接存储接口。
+
+入口为 `src/App.vue`。TinyMCE 使用 inline 模式，与公式 SDK 共用 document；工具栏、主题、图标、插件和样式均由 npm 包本地加载，无需 CDN 或 Tiny Cloud API Key。不可编辑节点由 TinyMCE 6 核心支持，无需加载旧版 noneditable 插件。
+
+## 公式包
+
+`vendor/formula-editor-modal-0.2.31.tgz` 由源项目的 `src/sdk/index.ts` 入口构建，组件、渲染引擎与字体均包含在包内。本项目依赖本地 tgz，无需复制源码，安装后也无需保留相邻的 `math` 目录。
+
+更新 SDK 时，在源项目构建后将新版本包输出到本项目（以下命令在 `math` 目录执行）：
+
+```sh
+npm run build:sdk
+npm pack --pack-destination ../math-latex-input/vendor
+```
+
+源项目先提升版本，随后在本项目运行 `pnpm add ./vendor/formula-editor-modal-新版本.tgz`，提交新包和锁文件，再重启开发服务。请部署整个 `dist` 目录，保留公式引擎和字体的动态加载文件。
+
+## 手工回归
+
+1. 打开页面，检查示例方程正常显示。
+2. 在正文末尾插入 `x^2+1`，导出结果应包含 `$x^2+1$`。
+3. 双击新公式改为 `x^3+2`，导出只保留新公式，原示例方程仍然存在。
+4. 点击 TinyMCE 的 Undo / Redo，确认公式回退和恢复；打开公式弹窗后取消，应保持正文不变。
+
+构建会提示较大的 chunk：TinyMCE、MathLive、MathJax 为本地完整依赖，其中公式引擎和字体按需加载。
